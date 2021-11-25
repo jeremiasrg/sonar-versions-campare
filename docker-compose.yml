@@ -1,0 +1,91 @@
+version: "3"
+
+services:
+
+#############################################################
+######################### OLD ###############################
+
+  postgres-sonar-old:
+    image: postgres:9.6.23-bullseye
+    container_name: postgres-sonar-old
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    ports:
+      - "15432:5432"
+    #volumes:
+    #  - ./volumes/db/old:/var/lib/postgresql/data
+    networks:
+      - sonar
+      
+  sonar-old:
+    image: sonarqube:7.9.1-community
+    container_name: sonar-old
+    environment:
+      SONARQUBE_JDBC_URL: jdbc:postgresql://postgres-sonar-old:5432/sonar
+      SONARQUBE_JDBC_USERNAME: sonar
+      SONARQUBE_JDBC_PASSWORD: sonar
+    ports:
+      - "7002:9000"
+    volumes:
+      - ./volumes/sonar/old/data:/opt/sonarqube/data
+      - ./volumes/sonar/old/extensions:/opt/sonarqube/extensions
+      - ./volumes/sonar/old/logs:/opt/sonarqube/logs
+    networks:
+      - sonar
+
+##########################################################
+######################### NEW ###############################
+
+  postgres-sonar-new:
+    image: postgres:9.6.23-bullseye
+    container_name: postgres-sonar-new
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    ports:
+      - "25432:5432"
+    #volumes:
+      #- ./volumes/db/new:/var/lib/postgresql/data
+    networks:
+      - sonar
+      
+  sonar-new:
+    image: sonarqube:9.2.0-community
+    
+    container_name: sonar-new
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres-sonar-new:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    ports:
+      - "8001:9000"
+      - "8002:9001"
+    volumes:
+      - ./volumes/sonar/new/data:/opt/sonarqube/data
+      - ./volumes/sonar/new/extensions:/opt/sonarqube/extensions
+      - ./volumes/sonar/new/logs:/opt/sonarqube/logs
+    networks:
+      - sonar
+
+
+##########################################################
+######################### OTHERS ###############################
+
+  pgAdmin:
+    image: dpage/pgadmin4
+    container_name: pg-admin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "123"
+    ports:
+      - "1234:80"
+    depends_on:
+      - postgres-sonar-old
+    networks:
+      - sonar
+
+
+networks:
+  sonar:
+    driver: bridge
