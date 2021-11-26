@@ -6,15 +6,15 @@ services:
 ######################### OLD ###############################
 
   postgres-sonar-old:
-    image: postgres:9.6.23-bullseye
+    image: postgres
     container_name: postgres-sonar-old
     environment:
       POSTGRES_USER: sonar
       POSTGRES_PASSWORD: sonar
     ports:
       - "15432:5432"
-    #volumes:
-    #  - ./volumes/db/old:/var/lib/postgresql/data
+    volumes:
+      - ./volumes/db/old:/var/lib/postgresql/data
     networks:
       - sonar
       
@@ -38,20 +38,20 @@ services:
 ######################### NEW ###############################
 
   postgres-sonar-new:
-    image: postgres:9.6.23-bullseye
+    image: postgres
     container_name: postgres-sonar-new
     environment:
       POSTGRES_USER: sonar
       POSTGRES_PASSWORD: sonar
     ports:
       - "25432:5432"
-    #volumes:
-      #- ./volumes/db/new:/var/lib/postgresql/data
+    volumes:
+      - ./volumes/db/new:/var/lib/postgresql/data
     networks:
       - sonar
       
   sonar-new:
-    image: sonarqube:9.2.0-community
+    image: sonarqube:8.9.3-community
     
     container_name: sonar-new
     environment:
@@ -60,7 +60,6 @@ services:
       SONAR_JDBC_PASSWORD: sonar
     ports:
       - "8001:9000"
-      - "8002:9001"
     volumes:
       - ./volumes/sonar/new/data:/opt/sonarqube/data
       - ./volumes/sonar/new/extensions:/opt/sonarqube/extensions
